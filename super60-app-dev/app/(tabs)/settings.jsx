@@ -35,12 +35,12 @@ const settings = () => {
   useEffect(()=>{
     async function init(){
       await setData();
-      // await getData();
+      await getData();
     }
     init();
   },[])
 
-  getData();
+ 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

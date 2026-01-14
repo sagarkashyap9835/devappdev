@@ -1,60 +1,92 @@
-import { StyleSheet, Text, View } from "react-native";
+
+import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Card from '../../components/globals/Card';
 
 const settings = () => {
-  const [token, setToken] = useState("");
-  // setting token or data in asyncStorage
+  const [products, setProducts] = useState([]);
 
-  const setData = async()=>{
-    try{
-      await AsyncStorage.setItem("keyHere",JSON.stringify({id:123, name:"Sujal", token:"abcd223454"}))
+  const courseData = [
+    {
+      id: "prod_ABC123",
+      name: "Java Course Pro Membership",
+      imageLink: "https://res.cloudinary.com/www-awdiz-in/image/upload/v1694292243/courses/java/advanced-java-training-in-vashi.webp",
+      description: "Unlock all premium courses and features with Pro Membership for JAVA courses.",
+      price: 49.99,
+      currency: "USD",
+      isWishlisted: true,
     }
-    catch(error){
+  ];
+
+  const setData = async () => {
+    try {
+      await AsyncStorage.setItem("course_key", JSON.stringify(courseData));
+    } catch (error) {
       console.log("Error storing data", error);
     }
   }
-  
-  // get a value from asyncStorage
-  const getData =async()=>{
-    try{
-      const value = await AsyncStorage.getItem("keyHere");
-      setToken(JSON.parse(value).token)
-      if(!value){
-        console.log("No value found");
-        return;
+
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("course_key");
+      if (value !== null) {
+        setProducts(JSON.parse(value));
       }
-    }
-    catch(error){
+    } catch (error) {
       console.log("Error retrieving data", error);
     }
   }
 
-  useEffect(()=>{
-    async function init(){
+  useEffect(() => {
+    const init = async () => {
       await setData();
       await getData();
     }
     init();
-  },[])
+  }, []);
 
- 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{fontSize:55, textAlign:'center'}}>{token}</Text>
-        <Text style={{fontSize:18, textAlign:'center', padding:16}}>
-          This is a placeholder for the Settings screen. You can add settings
-        </Text>
-
-        <Link href="/" style={{fontSize:18, color:'blue', textAlign:'center', padding:16}}>Go Back Home button</Link>
-      </View>
+      <Text style={styles.header}>Featured Courses</Text>
+      
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {products.map((item) => (
+          <Card 
+            key={item.id}
+            name={item.name}
+            price={item.price}
+            description={item.description}
+            currency={item.currency}
+            isWishlisted={item.isWishlisted}
+          >
+            
+            <Image 
+              source={{ uri: item.imageLink }} 
+              style={{ width: '100%', height: 100, borderRadius: 12 }} 
+              resizeMode="cover"
+            />
+          </Card>
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 export default settings;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    padding: 16,
+    textAlign: 'center'
+  },
+  scrollContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 8,
+  }
+});
